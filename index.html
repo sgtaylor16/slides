@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lightweight Slides</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="deck" aria-label="Slide deck">
+      <section class="slide" aria-label="Title slide">
+        <div class="slide-content">
+          <p class="eyebrow">Minimal section slides</p>
+          <h1>One section at a time</h1>
+          <p class="lead">
+            A tiny presentation system built from plain HTML, CSS, and a small
+            script.
+          </p>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Image slide">
+        <div class="slide-content stack">
+          <h2>Images stay centered and contained</h2>
+          <img
+            src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
+            alt="Mountain landscape at sunrise"
+          />
+          <ul>
+            <li>My First Comment</li>
+            <li>My Second Comment</li>
+            <li>My Third Comment</li>
+            <li>My Fourth Comment</li>
+            <li>My Fifth Comment</li>
+            <li>My Sixth Comment</li>
+            <li>My Seventh Comment</li>
+            <li>My Eighth Comment</li>
+            <li>My Ninth Comment</li>
+            <li>My Tenth Comment</li>
+            <li>My Eleventh Comment</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Bulleted list slide">
+        <div class="slide-content stack">
+          <h2>Bullets work without special markup</h2>
+          <ul>
+            <li>Use ordinary section elements for slides</li>
+            <li>Advance with arrow keys or space</li>
+            <li>Keep the implementation dependency-free</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Closing slide">
+        <div class="slide-content stack">
+          <h2>Small enough to paste into a document</h2>
+          <p>
+            The goal is a lightweight alternative to Reveal.js, not a full
+            presentation framework.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script src="slides.js"></script>
+  </body>
+</html>
