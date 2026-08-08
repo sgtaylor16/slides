@@ -1,55 +1,102 @@
-const slides = Array.from(document.querySelectorAll('.slide'));
+// Build 2D deck structure: each main slide tracks its optional subslides.
+const deck = Array.from(document.querySelectorAll('.slide')).map((el) => ({
+  el,
+  subs: Array.from(el.querySelectorAll(':scope > .subslide')),
+}));
 
-if (slides.length > 0) {
-  const indexFromHash = () => {
-    const parsed = Number.parseInt(window.location.hash.slice(1), 10);
-    return Number.isFinite(parsed) ? parsed : 0;
+if (deck.length > 0) {
+  const clamp = (val, lo, hi) => Math.max(lo, Math.min(val, hi));
+
+  const parseHash = () => {
+    const parts = window.location.hash.slice(1).split('/');
+    const main = Number.parseInt(parts[0], 10);
+    const sub  = Number.parseInt(parts[1] ?? '0', 10);
+    return {
+      main: Number.isFinite(main) ? main : 0,
+      sub:  Number.isFinite(sub)  ? sub  : 0,
+    };
   };
 
-  const clampIndex = (index) => Math.max(0, Math.min(index, slides.length - 1));
+  let { main: mainIdx, sub: subIdx } = parseHash();
+  mainIdx = clamp(mainIdx, 0, deck.length - 1);
+  subIdx  = clamp(subIdx, 0, Math.max(0, deck[mainIdx].subs.length - 1));
 
-  let activeIndex = clampIndex(indexFromHash());
+  const currentSubs = () => deck[mainIdx].subs;
 
   const updateHash = () => {
-    const nextHash = `#${activeIndex}`;
+    const nextHash = subIdx > 0 ? `#${mainIdx}/${subIdx}` : `#${mainIdx}`;
     if (window.location.hash !== nextHash) {
       history.replaceState(null, '', nextHash);
     }
   };
 
   const render = (scrollToTop = true) => {
-    slides.forEach((slide, index) => {
-      const isActive = index === activeIndex;
-      slide.classList.toggle('is-active', isActive);
-      slide.hidden = !isActive;
-      slide.toggleAttribute('inert', !isActive);
-      slide.setAttribute('aria-hidden', String(!isActive));
+    deck.forEach(({ el, subs }, mi) => {
+      const isMain = mi === mainIdx;
+      el.classList.toggle('is-active', isMain);
+      el.hidden = !isMain;
+      el.toggleAttribute('inert', !isMain);
+      el.setAttribute('aria-hidden', String(!isMain));
+
+      subs.forEach((sub, si) => {
+        const isSub = isMain && si === subIdx;
+        sub.classList.toggle('is-active', isSub);
+        sub.hidden = !isSub;
+        sub.toggleAttribute('inert', !isSub);
+        sub.setAttribute('aria-hidden', String(!isSub));
+      });
     });
     updateHash();
     if (scrollToTop) window.scrollTo({ top: 0 });
   };
 
-  const move = (delta) => {
-    activeIndex = clampIndex(activeIndex + delta);
+  // Smart advance: step sub-slides first, then advance main slide.
+  const smartAdvance = () => {
+    const subs = currentSubs();
+    if (subs.length > 0 && subIdx < subs.length - 1) {
+      subIdx++;
+    } else if (mainIdx < deck.length - 1) {
+      mainIdx++;
+      subIdx = 0;
+    }
     render();
   };
 
   window.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') {
-      event.preventDefault();
-      move(1);
-      return;
-    }
-
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      move(-1);
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        if (mainIdx < deck.length - 1) { mainIdx++; subIdx = 0; render(); }
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        if (mainIdx > 0) { mainIdx--; subIdx = 0; render(); }
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        if (currentSubs().length > 0 && subIdx < currentSubs().length - 1) {
+          subIdx++; render();
+        }
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        if (currentSubs().length > 0 && subIdx > 0) {
+          subIdx--; render();
+        }
+        break;
+      case ' ':
+        event.preventDefault();
+        smartAdvance();
+        break;
     }
   });
 
-  window.addEventListener('click', () => move(1), { passive: true });
+  window.addEventListener('click', smartAdvance, { passive: true });
+
   window.addEventListener('hashchange', () => {
-    activeIndex = clampIndex(indexFromHash());
+    const parsed = parseHash();
+    mainIdx = clamp(parsed.main, 0, deck.length - 1);
+    subIdx  = clamp(parsed.sub, 0, Math.max(0, deck[mainIdx].subs.length - 1));
     render(false);
   });
 

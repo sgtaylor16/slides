@@ -44,6 +44,14 @@ body {
   display: grid;
 }
 
+/* Sub-slides mirror main slide visibility and layout */
+.subslide.is-active {
+  display: grid;
+  min-height: 100vh;
+  place-items: start;
+  padding: var(--slide-padding);
+}
+
 .slide-content {
   width: 100%;
   padding: clamp(0.9rem, 2vw, 1.5rem);
