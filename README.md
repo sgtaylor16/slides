@@ -8,9 +8,11 @@ Each slide is a top-level `section` element with the class `slide` inside the `m
 
 The current implementation supports:
 
-- keyboard navigation with `ArrowRight`, `ArrowDown`, and `Space`
-- moving backward with `ArrowLeft` and `ArrowUp`
-- restoring the current slide from the URL hash
+- two-level navigation: main slides and optional sub-slides within each main slide
+- `ArrowDown` / `ArrowUp` to move between main slides
+- `ArrowRight` / `ArrowLeft` to step through sub-slides within the current main slide
+- `Space` or click to smart-advance (step sub-slides first, then move to the next main slide)
+- restoring the current position from the URL hash (`#main` or `#main/sub`)
 - images and bulleted lists using normal HTML markup
 
 ## Open It
@@ -25,9 +27,9 @@ Open [index.html](index.html) in a browser. The page can be used directly from d
 
 ## Writing Slides
 
-Create one `section.slide` per slide. Keep the content inside a `.slide-content` wrapper when you want the default panel styling.
+### Flat slide (no sub-slides)
 
-Example:
+Create one `section.slide` per slide. Keep the content inside a `.slide-content` wrapper when you want the default panel styling.
 
 ```html
 <section class="slide" aria-label="My slide">
@@ -43,13 +45,38 @@ Example:
 
 Images work as normal `<img>` tags. Bulleted lists work as normal `<ul>` and `<li>` elements.
 
+### Slide with sub-slides
+
+Nest `section.subslide` elements directly inside a `section.slide`. Each sub-slide holds its own content and is navigated with `ArrowRight` / `ArrowLeft`.
+
+```html
+<section class="slide" aria-label="My topic">
+  <section class="subslide" aria-label="Step 1">
+    <div class="slide-content stack">
+      <h2>Step 1</h2>
+      <p>First sub-slide content.</p>
+    </div>
+  </section>
+  <section class="subslide" aria-label="Step 2">
+    <div class="slide-content stack">
+      <h2>Step 2</h2>
+      <p>Second sub-slide content.</p>
+    </div>
+  </section>
+</section>
+```
+
 ## Navigation
 
-- `ArrowRight`, `ArrowDown`, or `Space` advances to the next slide.
-- `ArrowLeft` or `ArrowUp` goes back.
-- Clicking anywhere on the page also advances one slide.
+| Key / action | Effect |
+|---|---|
+| `ArrowDown` | Move to the next main slide |
+| `ArrowUp` | Move to the previous main slide |
+| `ArrowRight` | Advance to the next sub-slide (if any) |
+| `ArrowLeft` | Go back to the previous sub-slide (if any) |
+| `Space` or click | Smart advance: step sub-slides first, then move to next main slide |
 
-The current slide is stored in the URL hash, so reloading the page returns to the same slide.
+The current position is stored in the URL hash as `#slide` or `#slide/sub`, so reloading the page returns to the same location.
 
 ## Customizing
 
