@@ -113,8 +113,6 @@ li + li {
 img {
   display: block;
   width: 100%;
-  max-height: min(30vh, 16rem);
-  object-fit: cover;
   border-radius: 0.85rem;
 }
 
